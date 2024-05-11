@@ -8,6 +8,7 @@
 #include <backends/flanterm/flanterm.h>
 
 // Libc Includes
+#include <libc/stdio/printf.h>
 #include <libc/string.h>
 
 // Freestanding headers
@@ -15,6 +16,8 @@
 #include <stddef.h>
 
 #ifdef LEAF_LIMINE
+static volatile LIMINE_BASE_REVISION(2);
+
 volatile struct limine_framebuffer_request framebuffer_request = {
 	.id = LIMINE_FRAMEBUFFER_REQUEST, .revision = 0};
 #endif
@@ -25,6 +28,8 @@ static void hcf(void) {
 		__asm__("hlt");
 	}
 }
+
+struct flanterm_context *ft_ctx;
 
 // Kernel entry point.
 void _start(void) {
@@ -49,7 +54,7 @@ void _start(void) {
 		hcf();
 	}
 
-	struct flanterm_context *ft_ctx = flanterm_fb_init(
+	ft_ctx = flanterm_fb_init(
 		NULL, NULL, framebuffer->address, framebuffer->width,
 		framebuffer->height, framebuffer->pitch, framebuffer->red_mask_size,
 		framebuffer->red_mask_shift, framebuffer->green_mask_size,
@@ -57,9 +62,7 @@ void _start(void) {
 		framebuffer->blue_mask_shift, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 		NULL, 0, 0, 1, 0, 0, 0);
 
-	const char msg[] = "Leaf Kernel v0.1.0-rewrite\n";
-
-	flanterm_write(ft_ctx, msg, sizeof(msg));
+	printf("Hello, World!\n");
 
 	// Do nothing.
 	hcf();

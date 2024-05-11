@@ -1,10 +1,12 @@
 #ifndef __BOOT_H__
 #define __BOOT_H__
 
+#include <backends/flanterm/flanterm.h>
+
+extern struct flanterm_context *ft_ctx;
+
 #ifdef LEAF_LIMINE
 #include <limine/limine.h>
-
-static volatile LIMINE_BASE_REVISION(2);
 
 extern volatile struct limine_framebuffer_request framebuffer_request;
 
