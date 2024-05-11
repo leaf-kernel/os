@@ -1,5 +1,11 @@
-#include <backends/framebuffer.h>
 #include <sys/boot.h>
+
+// Wrapper includes
+#include <backends/framebuffer.h>
+
+// Flanterm Includes
+#include <backends/flanterm/backends/fb.h>
+#include <backends/flanterm/flanterm.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -16,6 +22,25 @@ static void hcf(void) {
 	}
 }
 
+// Internal string.h definitions.
+void *memcpy(void *dest, const void *src, size_t n) {
+	char *d = (char *)dest;
+	const char *s = (const char *)src;
+	while(n-- > 0) {
+		*d++ = *s++;
+	}
+	return dest;
+}
+
+void *memset(void *s, int c, size_t n) {
+	unsigned char *p = (unsigned char *)s;
+	while(n-- > 0) {
+		*p++ = (unsigned char)c;
+	}
+	return s;
+}
+
+// Kernel entry point.
 void _start(void) {
 	struct leaf_framebuffer *framebuffer;
 
@@ -38,10 +63,17 @@ void _start(void) {
 		hcf();
 	}
 
-	for(size_t i = 0; i < 100; i++) {
-		volatile uint32_t *fb_ptr = framebuffer->address;
-		fb_ptr[i * (framebuffer->pitch / 4) + i] = 0xffffff;
-	}
+	struct flanterm_context *ft_ctx = flanterm_fb_init(
+		NULL, NULL, framebuffer->address, framebuffer->width,
+		framebuffer->height, framebuffer->pitch, framebuffer->red_mask_size,
+		framebuffer->red_mask_shift, framebuffer->green_mask_size,
+		framebuffer->green_mask_shift, framebuffer->blue_mask_size,
+		framebuffer->blue_mask_shift, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+		NULL, 0, 0, 1, 0, 0, 0);
+
+	const char msg[] = "Leaf Kernel v0.1.0-rewrite\n";
+
+	flanterm_write(ft_ctx, msg, sizeof(msg));
 
 	// Do nothing.
 	hcf();

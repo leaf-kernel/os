@@ -3,3 +3,4 @@
 rm -rf release
 rm -rf build-*
 rm -rf arch/x86_64/limine
+rm -rf kernel/include/backends/flanterm

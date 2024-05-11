@@ -10,3 +10,4 @@
 /arch/x86_64/limine
 COM*
 .*.swp
+/kernel/include/backends/flanterm

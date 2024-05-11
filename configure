@@ -6,7 +6,7 @@ echo ">>> Formating code."
 find kernel -type f \( -iname \*.c -o -iname \*.h \) -print0 | xargs -0 clang-format -i
 
 
-echo ">>> Downloading bootloader."
+echo ">>> Downloading dependecies."
 if [ "$target_arch" = "x86_64" ]; then
     if [ ! -d "arch/$target_arch/limine" ]; then
         temp_dir=$(mktemp -d)
@@ -20,6 +20,22 @@ if [ "$target_arch" = "x86_64" ]; then
     else
         echo ">> Limine for $target_arch already exists! ("arch/$target_arch/limine") will be using that."
     fi
+fi
+
+flanterm_out="kernel/include/backends/flanterm";
+if [ "$target_arch" = "x86_64" -o "$target_arch" = "x86" ]; then
+    if [ ! -d "$flanterm_out" ]; then
+        temp_dir=$(mktemp -d)
+        echo ">>> Downloading Flanterm for x86_64."
+        wget -O "$temp_dir/flanterm.zip" "https://codeload.github.com/mintsuki/flanterm/zip/refs/heads/trunk" -q
+        unzip -o "$temp_dir/flanterm.zip" -d "$temp_dir/extracted" > /dev/null
+        mkdir -p "$flanterm_out"
+        mv "$temp_dir/extracted/flanterm-trunk/"* "$flanterm_out"
+        rm -rf "$temp_dir"
+        echo ">>> Successfully downloaded Flanterm for the $target_arch target."
+    else
+        echo ">> Flanterm for $target_arch already exists! ("$flanterm_out") will be using that."
+    fi 
 fi
 
 echo ">>> Configuring leaf to build for $target_arch."
