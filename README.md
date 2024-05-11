@@ -8,9 +8,7 @@ Light as a leaf!
 Leaf is a Operating System Kernel written in C. The name came from the use: The kernel is as light as a leaf!
 
 ## Copiling
-
-> [!IMPORTANT]
-> ### Please install the dependencies first
+### Dependecies
 > * `qemu` (OPTIONAL) - For emulating the Kernel
 > * `cmake` - For building the kernel
 > * `xorriso` - For creating the ISO image
@@ -22,11 +20,8 @@ Leaf is a Operating System Kernel written in C. The name came from the use: The 
 > ```
 > and on Fedora Systems:
 > ```bash
-> $ sudo dnf install qemu cmake xorriso nasm
-> ```
->> [!WARNING]
->> This does not install the cross compiler
-
+$ sudo dnf install qemu cmake xorriso nasm
+```
 First we need to <b>configure</b> the kernel:
 ```bash
 $ ./configure <arch>
