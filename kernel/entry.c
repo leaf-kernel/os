@@ -62,7 +62,10 @@ void _start(void) {
 		framebuffer->blue_mask_shift, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 		NULL, 0, 0, 1, 0, 0, 0);
 
-	printf("Hello, World!\n");
+	ft_ctx->cursor_enabled = false;
+	ft_ctx->full_refresh(ft_ctx);
+
+	printf("Leaf Kernel v0.0.1-rewrite\n");
 
 	// Do nothing.
 	hcf();
