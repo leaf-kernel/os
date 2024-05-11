@@ -142,7 +142,8 @@ static inline void _out_dbg(char character, UNUSED void *buffer,
 	if(character == 0)
 		return;
 
-	write_serial(character);
+	if(_serial_has_been_init)
+		write_serial(character);
 }
 
 // internal null output
