@@ -2,16 +2,20 @@
 #include <arch/x86_64/apic/lapic.h>
 #include <arch/x86_64/cpu/cpu.h>
 #include <arch/x86_64/drivers/serial.h>
+#include <sys/boot.h>
 #include <sys/error.h>
+#include <tools/logger.h>
 
 uint32_t ticks = 0;
 
 uint32_t rreg(uint16_t offset) {
-	return *((uint32_t *)((uint64_t)madt_table->lapic_addr + offset));
+	uint64_t base = PHYS_TO_VIRT(madt_table->lapic_addr);
+	return *((uint32_t *)(base + offset));
 }
 
 void wreg(uint16_t offset, uint32_t val) {
-	*((uint32_t *)((uint64_t)madt_table->lapic_addr + offset)) = val;
+	uint64_t base = PHYS_TO_VIRT(madt_table->lapic_addr);
+	*((uint32_t *)(base + offset)) = val;
 }
 
 void lapic_timer_stop() {
