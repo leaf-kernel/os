@@ -19,9 +19,6 @@
 #include <arch/x86_64/mm/heap.h>
 #include <arch/x86_64/mm/pmm.h>
 
-// Other includes lol
-#include <dev/scheduler.h>
-
 // Tools includes
 #include <tools/logger.h>
 #include <tools/panic.h>
@@ -55,7 +52,7 @@ volatile struct limine_smp_request smp_request = {.id = LIMINE_SMP_REQUEST,
 
 struct flanterm_context *ft_ctx;
 
-void test() { printf("Hello, World!\n"); }
+void test(void) { printf("Hello, world!\n"); }
 
 // Kernel entry point.
 void _start(void) {
@@ -112,9 +109,5 @@ void _start(void) {
 	init_pmm();
 	init_acpi();
 	init_apic();
-	init_sched();
-
-	printf("pluh\n");
-
 	hlt();
 }
