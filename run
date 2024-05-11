@@ -1,0 +1,11 @@
+#!/bin/bash
+TARGET=${1:-x86_64}
+shift
+shift
+
+ISO_FILE="release/Leaf-$TARGET-$(date +%B-%Y).iso"
+
+./configure "$TARGET"
+./build "$TARGET"
+
+qemu-system-"$TARGET" -name "Leaf $TARGET" -drive file="$ISO_FILE",index=0,format=raw -machine q35 -rtc base=localtime,clock=host "$@"

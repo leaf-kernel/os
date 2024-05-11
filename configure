@@ -1,0 +1,49 @@
+#!/bin/bash
+target_arch=${1:-x86_64}
+toolchain=${3:-arch/$target_arch/$target_arch.toolchain.cmake}
+
+echo ">>> Formating code."
+find kernel -type f \( -iname \*.c -o -iname \*.h \) -print0 | xargs -0 clang-format -i
+
+
+echo ">>> Downloading bootloader."
+if [ "$target_arch" = "x86_64" ]; then
+    if [ ! -d "arch/$target_arch/limine" ]; then
+        temp_dir=$(mktemp -d)
+        echo ">>> Downloading limine for $target_arch."
+        wget -O "$temp_dir/limine.zip" "https://github.com/limine-bootloader/limine/archive/refs/heads/v7.x-binary.zip" -q
+        unzip -o "$temp_dir/limine.zip" -d "$temp_dir/extracted" > /dev/null
+        mkdir -p "arch/$target_arch/limine"
+        mv "$temp_dir/extracted/limine-7.x-binary/"* "arch/$target_arch/limine/"
+        rm -rf "$temp_dir"
+        echo ">>> Successfully downloaded limine for $target_arch."
+    else
+        echo ">> Limine for $target_arch already exists! ("arch/$target_arch/limine") will be using that."
+    fi
+fi
+
+echo ">>> Configuring leaf to build for $target_arch."
+
+if [ -d "build-$target_arch" ]; then
+  echo ">>> Leaf is already configured to build for $target_arch. To reconfigure run: rm -rf build-$target_arch; ./configure"
+  exit 1
+fi
+
+mkdir "build-$target_arch"
+pushd "build-$target_arch" > /dev/null
+
+if command -v "ninja" &> /dev/null; then
+    cmake .. -DTARGET_ARCH="$target_arch" -DCMAKE_TOOLCHAIN_FILE="$toolchain" -GNinja
+else
+    cmake .. -DTARGET_ARCH="$target_arch" -DCMAKE_TOOLCHAIN_FILE="$toolchain"
+fi
+
+config_status=$?
+popd > /dev/null
+
+if [[ $config_status -ne 0 ]]; then
+    echo ">>> Configuration for Leaf $target_arch failed!"
+    exit 1
+fi
+
+echo ">>> Configuration for Leaf $target_arch done."

@@ -1,0 +1,33 @@
+#!/bin/bash
+
+target_arch=${1:-x86_64}
+
+if [ ! -d "build-$target_arch" ]; then
+    echo ""build-$target_arch" Doest exist! You have to configure the kernel before building! Use: ./configure $target_arch."
+    exit
+fi
+
+if [[ "$(uname)" == "Darwin" ]]; then
+    cores=$(sysctl -n hw.physicalcpu)
+else
+    cores=$(nproc)
+fi
+
+pushd "build-$target_arch" > /dev/null
+if [ -e "Makefile" ]; then
+    make -j$cores
+else
+    ninja -j$cores
+fi
+status=$?
+if [ $status -ne 0 ]; then
+    echo -e ">>> \033[1m\033[31mFailed to build!\033[0m"
+    exit 1
+fi
+popd > /dev/null
+
+pushd "arch/$target_arch" > /dev/null
+./gen-iso.sh
+popd > /dev/null
+
+echo -e ">>> Successfully built Leaf-$target_arch."

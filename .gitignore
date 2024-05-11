@@ -1,0 +1,12 @@
+/.vscode/
+/build/
+/build-*/
+/bin/
+/release/
+/*.o/
+/*.bin/
+/*.iso/
+/.DS_Store/
+/arch/x86_64/limine
+COM*
+.*.swp
