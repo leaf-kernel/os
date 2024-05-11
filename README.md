@@ -1,17 +1,11 @@
-# Leaf Kernel
+# Leaf
 Light as a leaf!
 
 > [!NOTE]  
-> This is a rewrite of the [original Leaf Kernel](https://github.com/leaf-kernel/kernel)
+> If you are looking for the old repo check out [leaf-kernel/kernel-old](https://github.com/leaf-kernel/kernel-old)
 
 ## What is Leaf?
 Leaf is a Operating System Kernel written in C. The name came from the use: The kernel is as light as a leaf!
-
-## Compatibility
-|Arch|Support|Bootloader|
-|----|-------|----------|
-|x86-64|✔️|Limine|
-|x86|❌| Leaf-Bootloader|
 
 ## Copiling
 
@@ -20,16 +14,17 @@ Leaf is a Operating System Kernel written in C. The name came from the use: The 
 > * `qemu` (OPTIONAL) - For emulating the Kernel
 > * `cmake` - For building the kernel
 > * `xorriso` - For creating the ISO image
-> * A C cross compiler
+> * A C cross compiler and its binutils
 > * `nasm` - The assembler
 > You can install these on Debian based Systems using:
 > ```bash
-> $ sudo apt-get install qemu cmake xorriso {YOUR_CROSSCOMPILER} nasm
+> $ sudo apt-get install qemu cmake xorriso nasm
 > ```
 > and on Fedora Systems:
 > ```bash
-> $ sudo dnf install qemu cmake xorriso {YOUR_CROSSCOMPILER} nasm
+> $ sudo dnf install qemu cmake xorriso nasm
 > ```
+> *Note:* This doesnt install the crosscompiler.
 
 First we need to <b>configure</b> the kernel:
 ```bash
