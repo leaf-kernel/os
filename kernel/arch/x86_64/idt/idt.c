@@ -94,6 +94,8 @@ void excp_handler(int_frame_t frame) {
 
 		handler_func_t handler = irq_handlers[irq];
 
+		dprintf("Handler: 0x%.16llx\n", (uint64_t)handler);
+
 		if(handler != NULL) {
 			handler(&frame);
 		}
@@ -102,6 +104,10 @@ void excp_handler(int_frame_t frame) {
 	}
 }
 
-void irq_register(uint8_t irq, void *handler) { irq_handlers[irq] = handler; }
+void irq_register(uint8_t irq, void *handler) {
+	ioapic_redirect_irq(smp_request.response->bsp_lapic_id, irq + 32, irq,
+						false);
+	irq_handlers[irq] = handler;
+}
 
 void irq_deregister(uint8_t irq) { irq_handlers[irq] = NULL; }
