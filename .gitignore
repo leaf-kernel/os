@@ -1,13 +1,28 @@
+### VSCode ###
 /.vscode/
+
+### Builds ###
 /build/
 /build-*/
 /bin/
 /release/
+
+### Output ###
 /*.o/
 /*.bin/
 /*.iso/
 /.DS_Store/
+
+### Limine ###
 /arch/x86_64/limine
-COM*
-.*.swp
+
+### Flanterm
 /kernel/include/backends/flanterm
+
+### Neovim ###
+.cache/
+compile_commands.json
+
+### Other ###
+COM*
+*.*.swp
