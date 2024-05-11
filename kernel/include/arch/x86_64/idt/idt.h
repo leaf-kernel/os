@@ -56,4 +56,8 @@ void trigger_interupt(uint64_t a);
 void set_idt_gate(int num, uint64_t base, uint16_t sel, uint8_t flags);
 void init_idt();
 
+void register_irq();
+void irq_register(uint8_t irq, void *handler);
+void irq_deregister(uint8_t irq);
+
 #endif	// __IDT_H__

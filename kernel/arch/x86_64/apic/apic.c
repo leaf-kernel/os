@@ -1,6 +1,4 @@
 #include <arch/x86_64/apic/apic.h>
-#include <arch/x86_64/apic/ioapic.h>
-#include <arch/x86_64/apic/lapic.h>
 #include <arch/x86_64/cpu/cpuid.h>
 #include <sys/error.h>
 #include <tools/logger.h>

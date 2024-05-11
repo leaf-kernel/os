@@ -16,7 +16,11 @@
 #include <arch/x86_64/cpu/cpu.h>
 #include <arch/x86_64/drivers/serial.h>
 #include <arch/x86_64/idt/idt.h>
+#include <arch/x86_64/mm/heap.h>
 #include <arch/x86_64/mm/pmm.h>
+
+// Other includes lol
+#include <dev/scheduler.h>
 
 // Tools includes
 #include <tools/logger.h>
@@ -47,6 +51,8 @@ volatile struct limine_rsdp_request rsdp_request = {.id = LIMINE_RSDP_REQUEST,
 #endif
 
 struct flanterm_context *ft_ctx;
+
+void test() { printf("Hello, World!\n"); }
 
 // Kernel entry point.
 void _start(void) {
@@ -113,7 +119,9 @@ void _start(void) {
 		printf("weiner has %d core\n", g_acpi_cpu_count);
 
 	init_apic();
+	init_sched();
 
-	printf("weiner has arrived\n");
+	sched_add_process("test", test);
+
 	hlt();
 }

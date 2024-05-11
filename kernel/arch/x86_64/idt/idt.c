@@ -1,3 +1,4 @@
+#include <arch/x86_64/apic/apic.h>
 #include <arch/x86_64/cpu/cpu.h>
 #include <arch/x86_64/idt/idt.h>
 #include <libc/stdio/printf.h>
@@ -10,6 +11,7 @@
 
 idt_entry_t idt[IDT_ENTRIES];
 idt_pointer_t idt_p;
+void *irq_handlers[16];
 extern void *last_rbp;
 
 extern uint64_t isr_tbl[];
@@ -68,6 +70,10 @@ void init_idt() {
 		set_idt_gate(i, isr_tbl[i], 0x28, 0x8E);
 	}
 
+	for(size_t i = 0; i < 16; i++) {
+		irq_handlers[i] = NULL;
+	}
+
 	load_idt((uint64_t)&idt_p);
 	asm("cli");
 }
@@ -77,8 +83,21 @@ void excp_handler(int_frame_t frame) {
 		panic(exception_strings[frame.vector], &frame);
 		hcf();
 	} else if(frame.vector >= 0x20 && frame.vector <= 0x2f) {
-		// TODO: IRQ and PIC remapping
+		int irq = frame.vector - 0x20;
+		typedef void (*handler_func_t)(int_frame_t *);
+
+		handler_func_t handler = irq_handlers[irq];
+
+		if(handler != NULL) {
+			handler(&frame);
+		}
+
+		lapic_eoi(irq);
 	} else if(frame.vector == 0x80) {
 		// TODO: System calls
 	}
 }
+
+void irq_register(uint8_t irq, void *handler) { irq_handlers[irq] = handler; }
+
+void irq_deregister(uint8_t irq) { irq_handlers[irq] = NULL; }
