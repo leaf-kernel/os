@@ -1,6 +1,17 @@
-# The design of Leaf
-Note: This isnt completed yet!
+# The design of the Leaf kernel
 
-## 1.0 Kernel
-### 1.1 idk
-idk
+Note: This is not a finished design
+
+## 1. Kernel architecture
+
+### 1.1 General Architecture
+
+Leaf is a `hybrid kernel`
+
+## 2. Services
+
+Leaf has a service system called `maple`.
+
+### 2.1 Config file
+
+The configuration for a service is pretty straightforward.
