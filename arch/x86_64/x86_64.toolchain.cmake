@@ -17,8 +17,8 @@ endif()
 message(">>> Setting flags")
 set(COMMON_FLAGS "-std=c17 -g -ffreestanding -Wno-packed-bitfield-compat -fno-stack-protector -fno-stack-check -fno-omit-frame-pointer -fno-lto -fPIE -m64 -march=x86-64 -mabi=sysv -mno-80387 -mno-mmx -msse -msse2 -mno-red-zone -MP")
 
-set(CMAKE_C_FLAGS "${COMMON_FLAGS} -std=gnu11")
-set(CMAKE_CXX_FLAGS "${COMMON_FLAGS} -std=gnu++11")
+set(CMAKE_C_FLAGS "${COMMON_FLAGS}")
+set(CMAKE_CXX_FLAGS "${COMMON_FLAGS}")
 
 set(CMAKE_EXE_LINKER_FLAGS "-nostdlib -static -z max-page-size=0x1000 -T ${CMAKE_SOURCE_DIR}/arch/${TARGET_ARCH}/linker.ld")
 
