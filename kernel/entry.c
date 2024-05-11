@@ -7,6 +7,10 @@
 #include <backends/flanterm/backends/fb.h>
 #include <backends/flanterm/flanterm.h>
 
+// Libc Includes
+#include <libc/string.h>
+
+// Freestanding headers
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -20,24 +24,6 @@ static void hcf(void) {
 	for(;;) {
 		__asm__("hlt");
 	}
-}
-
-// Internal string.h definitions.
-void *memcpy(void *dest, const void *src, size_t n) {
-	char *d = (char *)dest;
-	const char *s = (const char *)src;
-	while(n-- > 0) {
-		*d++ = *s++;
-	}
-	return dest;
-}
-
-void *memset(void *s, int c, size_t n) {
-	unsigned char *p = (unsigned char *)s;
-	while(n-- > 0) {
-		*p++ = (unsigned char)c;
-	}
-	return s;
 }
 
 // Kernel entry point.
