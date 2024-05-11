@@ -11,6 +11,7 @@
 // Arch specific includes
 #include <arch/x86_64/acpi/acpi.h>
 #include <arch/x86_64/acpi/madt.h>
+#include <arch/x86_64/apic/apic.h>
 #include <arch/x86_64/cpu/cpu.h>
 #include <arch/x86_64/drivers/serial.h>
 #include <arch/x86_64/idt/idt.h>
@@ -109,6 +110,8 @@ void _start(void) {
 		printf("weiner has %d cores\n", g_acpi_cpu_count);
 	else
 		printf("weiner has %d core\n", g_acpi_cpu_count);
+
+	init_apic();
 
 	hlt();
 }
