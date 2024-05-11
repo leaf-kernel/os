@@ -15,7 +15,7 @@ Leaf is a Operating System Kernel written in C. The name came from the use: The 
 > * `cmake` - For building the kernel
 > * `xorriso` - For creating the ISO image
 > * A C cross compiler and its binutils
-> * `nasm` - The assembler
+> * `nasm` - The assembler </br>
 > You can install these on Debian based Systems using:
 > ```bash
 > $ sudo apt-get install qemu cmake xorriso nasm
@@ -24,7 +24,8 @@ Leaf is a Operating System Kernel written in C. The name came from the use: The 
 > ```bash
 > $ sudo dnf install qemu cmake xorriso nasm
 > ```
-> *Note:* This doesnt install the crosscompiler.
+> [!WARNING]
+> > This does not install the cross compiler
 
 First we need to <b>configure</b> the kernel:
 ```bash
