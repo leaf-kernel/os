@@ -11,6 +11,7 @@
 #include <arch/x86_64/cpu/cpu.h>
 #include <arch/x86_64/drivers/serial.h>
 #include <arch/x86_64/idt/idt.h>
+#include <arch/x86_64/mm/pmm.h>
 
 // Tools includes
 #include <tools/logger.h>
@@ -29,6 +30,12 @@ static volatile LIMINE_BASE_REVISION(2);
 
 volatile struct limine_framebuffer_request framebuffer_request = {
 	.id = LIMINE_FRAMEBUFFER_REQUEST, .revision = 0};
+
+volatile struct limine_memmap_request memmap_request = {
+	.id = LIMINE_MEMMAP_REQUEST, .revision = 0};
+
+volatile struct limine_hhdm_request hhdm_request = {.id = LIMINE_HHDM_REQUEST,
+													.revision = 0};
 #endif
 
 struct flanterm_context *ft_ctx;
@@ -50,6 +57,14 @@ void _start(void) {
 	struct limine_framebuffer *limine_framebuffer =
 		framebuffer_request.response->framebuffers[0];
 	framebuffer = (struct leaf_framebuffer *)limine_framebuffer;
+
+	if(memmap_request.response == NULL) {
+		hcf();
+	}
+
+	if(hhdm_request.response == NULL) {
+		hcf();
+	}
 #endif
 
 	if(framebuffer == NULL) {
@@ -66,10 +81,19 @@ void _start(void) {
 
 	ft_ctx->cursor_enabled = false;
 	ft_ctx->full_refresh(ft_ctx);
+
 	init_serial();
-	ok("Serial Initialized");
 	init_idt();
-	ok("IDT Initialized");
+	init_pmm();
+
+	void *test = (void *)pmm_request_page();
+	if(test == NULL) {
+		fatal("Failed to allocate page for test");
+	}
+
+	pmm_free(test);
+
+	printf("weiner");
 
 	hlt();
 }
