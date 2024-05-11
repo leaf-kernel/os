@@ -6,6 +6,7 @@
 void panic(const char *reason, int_frame_t *frame) {
 	int cpuId = 0;
 	if(frame != NULL) {
+		dprintf("Panic @ 0x%016llx\r\n", frame->rip);
 		fatal("panic(cpu %d @ 0x%016llx) type: %d (Name: %s) err: 0x%llx"
 			  "0x%lx!",
 			  cpuId, frame->rip, frame->vector, reason, frame->err);
