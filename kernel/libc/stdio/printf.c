@@ -31,6 +31,7 @@
 //
 // Note: Edited
 ///////////////////////////////////////////////////////////////////////////////
+#include <arch/x86_64/drivers/serial.h>
 #include <backends/flanterm/flanterm.h>
 #include <libc/stdio/printf.h>
 #include <stdbool.h>
@@ -141,7 +142,7 @@ static inline void _out_dbg(char character, UNUSED void *buffer,
 	if(character == 0)
 		return;
 
-	(void)character;
+	write_serial(character);
 }
 
 // internal null output

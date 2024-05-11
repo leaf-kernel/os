@@ -7,6 +7,9 @@
 #include <backends/flanterm/backends/fb.h>
 #include <backends/flanterm/flanterm.h>
 
+// Arch specific headers
+#include <arch/x86_64/drivers/serial.h>
+
 // Libc Includes
 #include <libc/stdio/printf.h>
 #include <libc/string.h>
@@ -64,8 +67,10 @@ void _start(void) {
 
 	ft_ctx->cursor_enabled = false;
 	ft_ctx->full_refresh(ft_ctx);
+	init_serial();
 
-	printf("Leaf Kernel v0.0.1-rewrite\n");
+	printf("Initialized serial! On %s\n", _serial_cur_com_char);
+	dprintf("Hello World!\n");
 
 	// Do nothing.
 	hcf();

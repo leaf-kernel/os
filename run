@@ -1,7 +1,6 @@
 #!/bin/bash
 TARGET=${1:-x86_64}
 shift
-shift
 
 ISO_FILE="release/Leaf-$TARGET-$(date +%B-%Y).iso"
 
