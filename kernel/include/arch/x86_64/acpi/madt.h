@@ -56,7 +56,11 @@ extern madt_t *madt_table;
 extern uint64_t g_ioapic_addr;
 extern uint64_t g_lapic_addr;
 extern uint32_t g_acpi_cpu_count;
+extern uint64_t g_acpi_ioapic_count;
 extern apic_lapic_t *g_acpi_lapic[CONFIG_CPU_MAX];
+extern apic_ioapic_t *g_acpi_ioapic[CONFIG_CPU_MAX];
+extern uint64_t g_acpi_iso_count;
+extern apic_iso_t *g_apic_isos[16];
 
 void init_madt(madt_t *madt_table);
 uint32_t madt_get_iso(uint32_t irq);

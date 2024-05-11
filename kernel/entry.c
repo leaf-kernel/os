@@ -113,5 +113,7 @@ void _start(void) {
 		printf("weiner has %d core\n", g_acpi_cpu_count);
 
 	init_apic();
+
+	printf("weiner has arrived\n");
 	hlt();
 }
