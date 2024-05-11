@@ -8,6 +8,8 @@
 #include <backends/flanterm/flanterm.h>
 
 // Arch specific includes
+#include <arch/x86_64/acpi/acpi.h>
+#include <arch/x86_64/acpi/madt.h>
 #include <arch/x86_64/cpu/cpu.h>
 #include <arch/x86_64/drivers/serial.h>
 #include <arch/x86_64/idt/idt.h>
@@ -35,6 +37,9 @@ volatile struct limine_memmap_request memmap_request = {
 	.id = LIMINE_MEMMAP_REQUEST, .revision = 0};
 
 volatile struct limine_hhdm_request hhdm_request = {.id = LIMINE_HHDM_REQUEST,
+													.revision = 0};
+
+volatile struct limine_rsdp_request rsdp_request = {.id = LIMINE_RSDP_REQUEST,
 													.revision = 0};
 #endif
 
@@ -65,6 +70,10 @@ void _start(void) {
 	if(hhdm_request.response == NULL) {
 		hcf();
 	}
+
+	if(rsdp_request.response == NULL) {
+		hcf();
+	}
 #endif
 
 	if(framebuffer == NULL) {
@@ -85,6 +94,7 @@ void _start(void) {
 	init_serial();
 	init_idt();
 	init_pmm();
+	init_acpi();
 
 	void *test = (void *)pmm_request_page();
 	if(test == NULL) {
@@ -93,7 +103,10 @@ void _start(void) {
 
 	pmm_free(test);
 
-	printf("weiner");
+	if(g_acpi_cpu_count > 1)
+		printf("weiner has %d cores", g_acpi_cpu_count);
+	else
+		printf("weiner has %d core", g_acpi_cpu_count);
 
 	hlt();
 }
