@@ -110,7 +110,7 @@ void _start(void) {
 	init_acpi();
 	init_apic();
 
-	printf("we up");
+	printf("we up\n");
 
 	hlt();
 }

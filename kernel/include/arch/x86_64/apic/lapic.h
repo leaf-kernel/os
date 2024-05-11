@@ -1,39 +1,58 @@
+// Full credits to: https://github.com/asterd-og/ZanOS
 #ifndef __LAPIC_H__
 #define __LAPIC_H__
 
-#define LAPIC_APICID 0x20
-#define LAPIC_APICVER 0x30
-#define LAPIC_TASKPRIOR 0x80
-#define LAPIC_EOI 0x0B0
-#define LAPIC_LDR 0x0D0
-#define LAPIC_DFR 0x0E0
-#define LAPIC_SPURIOUS 0x0F0
-#define LAPIC_ESR 0x280
-#define LAPIC_ICRL 0x300
-#define LAPIC_ICRH 0x310
-#define LAPIC_LVT_TMR 0x320
-#define LAPIC_LVT_PERF 0x340
-#define LAPIC_LVT_LINT0 0x350
-#define LAPIC_LVT_LINT1 0x360
-#define LAPIC_LVT_ERR 0x370
-#define LAPIC_TMRINITCNT 0x380
-#define LAPIC_TMRCURRCNT 0x390
-#define LAPIC_TMRDIV 0x3E0
-#define LAPIC_LAST 0x38F
-#define LAPIC_DISABLE 0x10000
-#define LAPIC_SW_ENABLE 0x100
-#define LAPIC_CPUFOCUS 0x200
-#define LAPIC_NMI (4 << 8)
-#define TMR_PERIODIC 0x20000
-#define TMR_BASEDIV (1 << 20)
-#define LVT_MASKED (1 << 16)
-
+#include <arch/x86_64/acpi/acpi.h>
 #include <arch/x86_64/acpi/madt.h>
 
+#include <stdint.h>
+
+#define LAPIC_PPR 0x00a0
+
+#define LAPIC_ICRLO 0x0300
+#define LAPIC_ICRHI 0x0310
+
+#define LAPIC_ICINI 0x0500
+#define LAPIC_ICSTR 0x0600
+
+#define LAPIC_ICEDGE 0x0000
+
+#define LAPIC_ICPEND 0x00001000
+#define LAPIC_ICPHYS 0x00000000
+#define LAPIC_ICASSR 0x00004000
+#define LAPIC_ICSHRTHND 0x00000000
+#define LAPIC_ICDESTSHIFT 24
+
+#define LAPIC_ICRAIS 0x00080000
+#define LAPIC_ICRAES 0x000c0000
+
+// Timer
+
+#define LAPIC_TIMER_DIV 0x3E0
+#define LAPIC_TIMER_INITCNT 0x380
+#define LAPIC_TIMER_LVT 0x320
+#define LAPIC_TIMER_DISABLE 0x10000
+#define LAPIC_TIMER_CURCNT 0x390
+#define LAPIC_TIMER_PERIODIC 0x20000
+
 void init_lapic();
+
+void lapic_stop_timer();
+void lapic_oneshot(uint8_t vec, uint64_t ms);
+void lapic_calibrate_timer();
+
+void lapic_write(uint32_t reg, uint32_t val);
+uint32_t lapic_read(uint32_t reg);
+
 void lapic_eoi();
 
-void lapic_timer_stop();
-void lapic_timer_oneshot(uint64_t ms, uint8_t vec);
+void lapic_ipi(uint32_t id, uint32_t dat);
+
+void lapic_send_all_int(uint32_t id, uint32_t vec);
+void lapic_send_others_int(uint32_t id, uint32_t vec);
+
+void lapic_init_cpu(uint32_t id);
+void lapic_start_cpu(uint32_t id, uint32_t vec);
+uint32_t lapic_get_id();
 
 #endif	// __LAPIC_H__

@@ -88,7 +88,14 @@ void excp_handler(int_frame_t frame) {
 		panic(exception_strings[frame.vector], &frame);
 		hcf();
 	} else if(frame.vector >= 0x20 && frame.vector <= 0x2f) {
-		// TODO: Handle IRQs
+		int irq = frame.vector - 0x20;
+		typedef void (*handler_func_t)(int_frame_t *);
+
+		handler_func_t handler = irq_handlers[irq];
+
+		if(handler != NULL) {
+			handler(&frame);
+		}
 	} else if(frame.vector == 0x80) {
 		// TODO: System calls
 	}
