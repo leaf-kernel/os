@@ -24,8 +24,8 @@ Leaf is a Operating System Kernel written in C. The name came from the use: The 
 > ```bash
 > $ sudo dnf install qemu cmake xorriso nasm
 > ```
-> [!WARNING]
-> > This does not install the cross compiler
+>> [!WARNING]
+>> This does not install the cross compiler
 
 First we need to <b>configure</b> the kernel:
 ```bash
