@@ -89,6 +89,3 @@ $ ./build <arch>
   SOFTWARE.
   
 </details>
-
-### Contributers
-[RaphtikAtGHG](https://github.com/RaphtikAtGHG) - Updating the README
