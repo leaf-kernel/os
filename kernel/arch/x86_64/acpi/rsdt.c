@@ -11,7 +11,6 @@ rsdt_t *g_rsdt;
 
 void init_rsdt() {
 	rsdp_t *rsdp = (rsdp_t *)rsdp_request.response->address;
-
 	g_rsdt = (rsdt_t *)(uintptr_t)PHYS_TO_VIRT(rsdp->rsdt_addr);
 	if(_use_xsdt()) {
 		xsdp_t *xsdp = (xsdp_t *)rsdp_request.response->address;
@@ -24,14 +23,13 @@ void init_rsdt() {
 		fail("Failed to find MADT!");
 		hcf();
 	}
-
 	init_madt(madt);
+
 	fadt_t *fadt = _find_sdt("FACP");
 	if(madt == NULL) {
 
 		fail("Failed to find FADT!");
 		hcf();
 	}
-
 	init_fadt(fadt);
 }

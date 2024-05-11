@@ -36,7 +36,7 @@ void schedule(int_frame_t *regs) {
 }
 void init_sched() {
 	memset(processes, 0, sizeof(processes));
-	irq_register(32, schedule);
+	irq_register(32, &schedule);
 }
 
 uint32_t sched_add_process(char *name, void (*entry)(void)) {

@@ -53,19 +53,17 @@ madt_ioapic *ioapic_get_gsi(uint32_t gsi) {
 		   ioapic->gsi_base + ioapic_gsi_count(ioapic) > gsi)
 			return ioapic;
 	}
+
 	return NULL;
 }
 
 void ioapic_redirect_gsi(uint32_t lapic_id, uint8_t vec, uint32_t gsi,
 						 uint16_t flags, bool mask) {
-	printf("LAPIC_ID: 0x%.8lx, VEC: %d, GSI: 0x%.8lx, FLAGS: 0x%.4x, MASK: "
-		   "%s\n",
-		   lapic_id, vec, gsi, flags, mask ? "yes" : "no");
 
 	madt_ioapic *ioapic = ioapic_get_gsi(gsi);
 
 	if(ioapic == NULL) {
-		error("IOAPIC: Invalid GSI", ERRNO_UNKNOWN, true);
+		error("IOAPIC: Invalid GSI", ERRNO_NULL_VALUE, true);
 	}
 
 	uint64_t redirect = vec;

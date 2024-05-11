@@ -8,6 +8,9 @@
 void error(char *error, uint8_t errno, bool f) {
 	char errno_str[64];
 	switch(errno) {
+	case ERRNO_NULL_VALUE:
+		strncpy(errno_str, "ERRNO_NULL_VALUE", sizeof(errno_str));
+		break;
 	case ERRNO_FEAT_INVALID:
 		strncpy(errno_str, "ERRNO_FEAT_INVALID", 64);
 		break;
