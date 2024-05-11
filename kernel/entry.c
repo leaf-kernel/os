@@ -8,10 +8,13 @@
 #include <backends/flanterm/flanterm.h>
 
 // Arch specific includes
+#include <arch/x86_64/cpu/cpu.h>
 #include <arch/x86_64/drivers/serial.h>
+#include <arch/x86_64/idt/idt.h>
 
 // Tools includes
 #include <tools/logger.h>
+#include <tools/panic.h>
 
 // Libc includes
 #include <libc/stdio/printf.h>
@@ -27,13 +30,6 @@ static volatile LIMINE_BASE_REVISION(2);
 volatile struct limine_framebuffer_request framebuffer_request = {
 	.id = LIMINE_FRAMEBUFFER_REQUEST, .revision = 0};
 #endif
-
-static void hcf(void) {
-	__asm__("cli");
-	for(;;) {
-		__asm__("hlt");
-	}
-}
 
 struct flanterm_context *ft_ctx;
 
@@ -71,9 +67,9 @@ void _start(void) {
 	ft_ctx->cursor_enabled = false;
 	ft_ctx->full_refresh(ft_ctx);
 	init_serial();
-	ok("Serial initialized");
-	ok("leaf-x86_64-rewrite ready.");
+	ok("Serial Initialized");
+	init_idt();
+	ok("IDT Initialized");
 
-	// Do nothing.
-	hcf();
+	hlt();
 }
