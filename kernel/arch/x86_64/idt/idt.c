@@ -87,7 +87,8 @@ void excp_handler(int_frame_t frame) {
 	if(frame.vector < 0x20) {
 		panic(exception_strings[frame.vector], &frame);
 		hcf();
-	} else if(frame.vector >= 0x20 && frame.vector <= 0x2f) {
+	} else if(frame.vector >= 0x20 && frame.vector <= 32) {
+		ok("IRQ %d got fired", frame.vector);
 		int irq = frame.vector - 0x20;
 		typedef void (*handler_func_t)(int_frame_t *);
 

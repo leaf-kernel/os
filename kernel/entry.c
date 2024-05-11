@@ -18,6 +18,7 @@
 #include <arch/x86_64/idt/idt.h>
 #include <arch/x86_64/mm/heap.h>
 #include <arch/x86_64/mm/pmm.h>
+#include <arch/x86_64/sched/scheduler.h>
 
 // Tools includes
 #include <tools/logger.h>
@@ -109,8 +110,10 @@ void _start(void) {
 	init_pmm();
 	init_acpi();
 	init_apic();
+	init_sched();
 
-	printf("we up\n");
+	sched_add_process("penis", test);
+	__asm__("int $32");
 
 	hlt();
 }
