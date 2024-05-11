@@ -3,18 +3,21 @@
 // Wrapper includes
 #include <backends/framebuffer.h>
 
-// Flanterm Includes
+// Flanterm includes
 #include <backends/flanterm/backends/fb.h>
 #include <backends/flanterm/flanterm.h>
 
-// Arch specific headers
+// Arch specific includes
 #include <arch/x86_64/drivers/serial.h>
 
-// Libc Includes
+// Tools includes
+#include <tools/logger.h>
+
+// Libc includes
 #include <libc/stdio/printf.h>
 #include <libc/string.h>
 
-// Freestanding headers
+// Freestanding header includes
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -68,9 +71,8 @@ void _start(void) {
 	ft_ctx->cursor_enabled = false;
 	ft_ctx->full_refresh(ft_ctx);
 	init_serial();
-
-	printf("Initialized serial! On %s\n", _serial_cur_com_char);
-	dprintf("Hello World!\n");
+	ok("Serial initialized");
+	ok("leaf-x86_64-rewrite ready.");
 
 	// Do nothing.
 	hcf();
