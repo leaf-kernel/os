@@ -4,6 +4,7 @@
 #include <libc/stdio/printf.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/boot.h>
 #include <tools/logger.h>
 #include <tools/panic.h>
 
@@ -79,25 +80,26 @@ void init_idt() {
 }
 
 void excp_handler(int_frame_t frame) {
+	if(frame.vector == 0xff)
+		return;
+
 	if(frame.vector < 0x20) {
 		panic(exception_strings[frame.vector], &frame);
 		hcf();
 	} else if(frame.vector >= 0x20 && frame.vector <= 0x2f) {
-		int irq = frame.vector - 0x20;
-		typedef void (*handler_func_t)(int_frame_t *);
-
-		handler_func_t handler = irq_handlers[irq];
-
-		if(handler != NULL) {
+		void (*handler)(int_frame_t *);
+		handler = irq_handlers[frame.vector - 32];
+		if(handler != NULL)
 			handler(&frame);
-		}
 
-		lapic_eoi(irq);
 	} else if(frame.vector == 0x80) {
 		// TODO: System calls
 	}
 }
 
-void irq_register(uint8_t irq, void *handler) { irq_handlers[irq] = handler; }
+void irq_register(uint8_t irq, void *handler) {
+	ioapic_redirect_irq(0, irq + 32, irq, false);
+	irq_handlers[irq] = handler;
+}
 
 void irq_deregister(uint8_t irq) { irq_handlers[irq] = NULL; }

@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#define PAGE_SIZE 0x1000
+#define PAGE_SIZE 4096
 void init_pmm();
 
 void *pmm_request_page();

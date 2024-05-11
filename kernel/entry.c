@@ -48,6 +48,9 @@ volatile struct limine_hhdm_request hhdm_request = {.id = LIMINE_HHDM_REQUEST,
 
 volatile struct limine_rsdp_request rsdp_request = {.id = LIMINE_RSDP_REQUEST,
 													.revision = 0};
+
+volatile struct limine_smp_request smp_request = {.id = LIMINE_SMP_REQUEST,
+												  .revision = 0};
 #endif
 
 struct flanterm_context *ft_ctx;
@@ -83,6 +86,10 @@ void _start(void) {
 	if(rsdp_request.response == NULL) {
 		hcf();
 	}
+
+	if(smp_request.response == NULL) {
+		hcf();
+	}
 #endif
 
 	if(framebuffer == NULL) {
@@ -103,25 +110,11 @@ void _start(void) {
 	init_serial();
 	init_idt();
 	init_pmm();
-
-	void *test = (void *)pmm_request_page();
-	if(test == NULL) {
-		error("Failed to initialize pmm!", ERRNO_KINIT_FAIL, true);
-	}
-
-	pmm_free(test);
-
 	init_acpi();
-
-	if(g_acpi_cpu_count > 1)
-		printf("weiner has %d cores\n", g_acpi_cpu_count);
-	else
-		printf("weiner has %d core\n", g_acpi_cpu_count);
-
 	init_apic();
 	init_sched();
 
-	sched_add_process("test", test);
+	printf("pluh\n");
 
 	hlt();
 }
