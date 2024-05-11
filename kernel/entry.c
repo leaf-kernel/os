@@ -1,6 +1,5 @@
-#include <sys/boot.h>
-
 #include <stdbool.h>
+#include <sys/boot.h>
 
 static void hcf(void) {
 	asm("cli");
