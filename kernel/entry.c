@@ -109,5 +109,8 @@ void _start(void) {
 	init_pmm();
 	init_acpi();
 	init_apic();
+
+	printf("we up");
+
 	hlt();
 }
