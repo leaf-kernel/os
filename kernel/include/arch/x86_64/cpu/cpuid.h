@@ -2,6 +2,8 @@
 #define __CPUID_H__
 
 #include <cpuid.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 enum cpuid_requests {
@@ -81,5 +83,6 @@ enum cpuid_features {
 };
 
 int cpuid_string(int code, uint32_t where[4]);
+bool cpuid_check_feature(uint32_t feat);
 
 #endif	// __CPUID_H__

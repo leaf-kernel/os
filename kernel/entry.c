@@ -1,4 +1,5 @@
 #include <sys/boot.h>
+#include <sys/error.h>
 
 // Wrapper includes
 #include <backends/framebuffer.h>
@@ -94,19 +95,20 @@ void _start(void) {
 	init_serial();
 	init_idt();
 	init_pmm();
-	init_acpi();
 
 	void *test = (void *)pmm_request_page();
 	if(test == NULL) {
-		fatal("Failed to allocate page for test");
+		error("Failed to initialize pmm!", ERRNO_KINIT_FAIL, true);
 	}
 
 	pmm_free(test);
 
+	init_acpi();
+
 	if(g_acpi_cpu_count > 1)
-		printf("weiner has %d cores", g_acpi_cpu_count);
+		printf("weiner has %d cores\n", g_acpi_cpu_count);
 	else
-		printf("weiner has %d core", g_acpi_cpu_count);
+		printf("weiner has %d core\n", g_acpi_cpu_count);
 
 	hlt();
 }

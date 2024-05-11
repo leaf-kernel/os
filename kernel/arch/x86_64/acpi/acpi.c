@@ -1,8 +1,10 @@
 
 #include <arch/x86_64/acpi/fadt.h>
 #include <arch/x86_64/acpi/rsdt.h>
+#include <arch/x86_64/cpu/cpuid.h>
 #include <arch/x86_64/drivers/serial.h>
 #include <sys/boot.h>
+#include <tools/panic.h>
 
 bool _xsdt_is_available;
 bool _acpi_mode;
