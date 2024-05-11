@@ -1,0 +1,5 @@
+#!/bin/bash
+#!/bin/bash
+rm -rf release
+rm -rf build-*
+rm -rf arch/x86_64/limine
