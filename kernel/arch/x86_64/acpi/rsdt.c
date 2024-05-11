@@ -18,7 +18,7 @@ void init_rsdt() {
 		g_xsdt = (xsdt_t *)(uintptr_t)PHYS_TO_VIRT(xsdp->xsdt_addr);
 	}
 
-	madt_t *madt = _find_sdt("APIC");
+	acpi_madt *madt = _find_sdt("APIC");
 	if(madt == NULL) {
 
 		fail("Failed to find MADT!");

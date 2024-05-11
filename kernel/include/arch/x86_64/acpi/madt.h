@@ -1,3 +1,4 @@
+// Full credits to: https://github.com/asterd-og/ZanOS
 #ifndef __MADT_H__
 #define __MADT_H__
 
@@ -9,60 +10,67 @@
 #include <arch/x86_64/cpu/cpu.h>
 #include <sys/boot.h>
 
-#define CONFIG_CPU_MAX 256
-
-#define APIC_LAPIC 0
-#define APIC_IOAPIC 1
-#define APIC_ISO 2
-#define APIC_IOAPIC_NMI 3
-#define APIC_LAPIC_NMI 4
-#define APIC_LAPIC_OVERRIDE 5
-#define APIC_X2APIC 9
-
 typedef struct {
-	sdt_t header;
-	uint32_t lapic_addr;
+	char sign[4];
+	uint32_t len;
+	uint8_t revision;
+	uint8_t checksum;
+	char oem_id[6];
+	char oem_table_id[8];
+	uint32_t oem_revision;
+	uint32_t creator_id;
+	uint32_t creator_revision;
+
+	/* MADT Specs */
+	uint32_t lapic_address;
 	uint32_t flags;
-} __attribute__((packed)) madt_t;
+
+	char table[];
+} acpi_madt;
+
 typedef struct {
 	uint8_t type;
-	uint8_t length;
-} __attribute__((packed)) apic_header_t;
+	uint8_t len;
+} madt_entry;
 
 typedef struct {
-	apic_header_t header;
-	uint8_t acpi_proc_id;
+	madt_entry un;
+	uint8_t cpu_id;
 	uint8_t apic_id;
 	uint32_t flags;
-} __attribute__((packed)) apic_lapic_t;
+} madt_cpu_lapic;
 
 typedef struct {
-	apic_header_t header;
-	uint8_t ioapic_id;
-	uint8_t reserved;
-	uint32_t ioapic_addr;
+	madt_entry un;
+	uint8_t apic_id;
+	uint8_t resv;
+	uint32_t apic_addr;
 	uint32_t gsi_base;
-} __attribute__((packed)) apic_ioapic_t;
+} madt_ioapic;
 
 typedef struct {
-	apic_header_t header;
-	uint8_t bus;
-	uint8_t irq;
+	madt_entry un;
+	uint8_t bus_src;
+	uint8_t irq_src;
 	uint32_t gsi;
 	uint16_t flags;
-} __attribute__((packed)) apic_iso_t;
+} madt_iso;
 
-extern madt_t *madt_table;
-extern uint64_t g_ioapic_addr;
-extern uint64_t g_lapic_addr;
-extern uint32_t g_acpi_cpu_count;
-extern uint64_t g_acpi_ioapic_count;
-extern apic_lapic_t *g_acpi_lapic[CONFIG_CPU_MAX];
-extern apic_ioapic_t *g_acpi_ioapic[CONFIG_CPU_MAX];
-extern uint64_t g_acpi_iso_count;
-extern apic_iso_t *g_apic_isos[16];
+typedef struct {
+	madt_entry un;
+	uint16_t resv;
+	uint64_t phys_lapic;
+} madt_lapic_addr;
 
-void init_madt(madt_t *madt_table);
+extern madt_ioapic *madt_ioapic_list[128];
+extern madt_iso *madt_iso_list[128];
+
+extern uint32_t madt_ioapic_len;
+extern uint32_t madt_iso_len;
+
+extern uint64_t *lapic_addr;
+
+void init_madt(acpi_madt *madt);
 uint32_t madt_get_iso(uint32_t irq);
 
 #endif	// __MADT_H__

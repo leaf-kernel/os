@@ -7,13 +7,13 @@
 #include <sys/error.h>
 
 void init_ioapic() {
-	apic_ioapic_t *ioapic = g_acpi_ioapic[0];
+	madt_ioapic *ioapic = madt_ioapic_list[0];
 
 	uint32_t val = ioapic_read(ioapic, IOAPIC_VER);
 	uint32_t count = ((val >> 16) & 0xFF);
 
-	if((ioapic_read(ioapic, 0) >> 24) != ioapic->ioapic_id) {
-		error("Failed to initialize IOAPIC", ERRNO_UNKNOWN, true);
+	if((ioapic_read(ioapic, 0) >> 24) != ioapic->apic_id) {
+		error("IOAPIC: IOAPIC ID mismatch", ERRNO_UNKNOWN, true);
 	}
 
 	for(uint32_t i = 0; i <= count; ++i) {
@@ -22,33 +22,33 @@ void init_ioapic() {
 	}
 }
 
-void ioapic_write(apic_ioapic_t *ioapic, uint8_t reg, uint32_t val) {
-	*((volatile uint32_t *)(PHYS_TO_VIRT(ioapic->ioapic_addr) +
-							IOAPIC_REGSEL)) = reg;
-	*((volatile uint32_t *)(PHYS_TO_VIRT(ioapic->ioapic_addr) + IOAPIC_IOWIN)) =
+void ioapic_write(madt_ioapic *ioapic, uint8_t reg, uint32_t val) {
+	*((volatile uint32_t *)(PHYS_TO_VIRT(ioapic->apic_addr) + IOAPIC_REGSEL)) =
+		reg;
+	*((volatile uint32_t *)(PHYS_TO_VIRT(ioapic->apic_addr) + IOAPIC_IOWIN)) =
 		val;
 }
 
-uint32_t ioapic_read(apic_ioapic_t *ioapic, uint8_t reg) {
-	*((volatile uint32_t *)(PHYS_TO_VIRT(ioapic->ioapic_addr) +
-							IOAPIC_REGSEL)) = reg;
-	return *((volatile uint32_t *)(PHYS_TO_VIRT(ioapic->ioapic_addr) +
-								   IOAPIC_IOWIN));
+uint32_t ioapic_read(madt_ioapic *ioapic, uint8_t reg) {
+	*((volatile uint32_t *)(PHYS_TO_VIRT(ioapic->apic_addr) + IOAPIC_REGSEL)) =
+		reg;
+	return *(
+		(volatile uint32_t *)(PHYS_TO_VIRT(ioapic->apic_addr) + IOAPIC_IOWIN));
 }
 
-void ioapic_set_entry(apic_ioapic_t *ioapic, uint8_t idx, uint64_t data) {
+void ioapic_set_entry(madt_ioapic *ioapic, uint8_t idx, uint64_t data) {
 	ioapic_write(ioapic, (uint8_t)(IOAPIC_REDTBL + idx * 2), (uint32_t)data);
 	ioapic_write(ioapic, (uint8_t)(IOAPIC_REDTBL + idx * 2 + 1),
 				 (uint32_t)(data >> 32));
 }
 
-uint64_t ioapic_gsi_count(apic_ioapic_t *ioapic) {
+uint64_t ioapic_gsi_count(madt_ioapic *ioapic) {
 	return (ioapic_read(ioapic, 1) & 0xff0000) >> 16;
 }
 
-apic_ioapic_t *ioapic_get_gsi(uint32_t gsi) {
-	for(uint64_t i = 0; i < g_acpi_ioapic_count; i++) {
-		apic_ioapic_t *ioapic = g_acpi_ioapic[i];
+madt_ioapic *ioapic_get_gsi(uint32_t gsi) {
+	for(uint64_t i = 0; i < madt_ioapic_len; i++) {
+		madt_ioapic *ioapic = madt_ioapic_list[i];
 		if(ioapic->gsi_base <= gsi &&
 		   ioapic->gsi_base + ioapic_gsi_count(ioapic) > gsi)
 			return ioapic;
@@ -58,7 +58,15 @@ apic_ioapic_t *ioapic_get_gsi(uint32_t gsi) {
 
 void ioapic_redirect_gsi(uint32_t lapic_id, uint8_t vec, uint32_t gsi,
 						 uint16_t flags, bool mask) {
-	apic_ioapic_t *ioapic = ioapic_get_gsi(gsi);
+	printf("LAPIC_ID: 0x%.8lx, VEC: %d, GSI: 0x%.8lx, FLAGS: 0x%.4x, MASK: "
+		   "%s\n",
+		   lapic_id, vec, gsi, flags, mask ? "yes" : "no");
+
+	madt_ioapic *ioapic = ioapic_get_gsi(gsi);
+
+	if(ioapic == NULL) {
+		error("IOAPIC: Invalid GSI", ERRNO_UNKNOWN, true);
+	}
 
 	uint64_t redirect = vec;
 
@@ -85,11 +93,11 @@ void ioapic_redirect_gsi(uint32_t lapic_id, uint8_t vec, uint32_t gsi,
 void ioapic_redirect_irq(uint32_t lapic_id, uint8_t vec, uint8_t irq,
 						 bool mask) {
 	uint8_t idx = 0;
-	apic_iso_t *iso;
+	madt_iso *iso;
 
-	while(idx < g_acpi_iso_count) {
-		iso = g_apic_isos[idx];
-		if(iso->irq == irq) {
+	while(idx < madt_iso_len) {
+		iso = madt_iso_list[idx];
+		if(iso->irq_src == irq) {
 			ioapic_redirect_gsi(lapic_id, vec, iso->gsi, iso->flags, mask);
 			return;
 		}
@@ -101,11 +109,11 @@ void ioapic_redirect_irq(uint32_t lapic_id, uint8_t vec, uint8_t irq,
 
 uint32_t ioapic_get_redirect_irq(uint8_t irq) {
 	uint8_t idx = 0;
-	apic_iso_t *iso;
+	madt_iso *iso;
 
-	while(idx < g_acpi_iso_count) {
-		iso = g_apic_isos[idx];
-		if(iso->irq == irq) {
+	while(idx < madt_iso_len) {
+		iso = madt_iso_list[idx];
+		if(iso->irq_src == irq) {
 			return iso->gsi;
 		}
 		idx++;

@@ -17,8 +17,8 @@
 
 void init_ioapic();
 
-void ioapic_write(apic_ioapic_t *ioapic, uint8_t reg, uint32_t val);
-uint32_t ioapic_read(apic_ioapic_t *ioapic, uint8_t reg);
+void ioapic_write(madt_ioapic *ioapic, uint8_t reg, uint32_t val);
+uint32_t ioapic_read(madt_ioapic *ioapic, uint8_t reg);
 
 void ioapic_redirect_irq(uint32_t lapic_id, uint8_t vec, uint8_t irq,
 						 bool mask);
