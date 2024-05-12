@@ -5,6 +5,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// todo
+void *malloc(size_t size);
+void *calloc(size_t count, size_t size);
+void *realloc(void *old, size_t size);
+void free(void *tofree);
 
 #endif	// __HEAP_H__

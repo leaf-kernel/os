@@ -91,13 +91,13 @@ void excp_handler(int_frame_t frame) {
 		panic(exception_strings[frame.vector], &frame);
 		hcf();
 	} else if(frame.vector >= 0x20 && frame.vector <= 32) {
-		ok("IRQ %d got fired", frame.vector);
 		int irq = frame.vector - 0x20;
 		typedef void (*handler_func_t)(int_frame_t *);
 
-		handler_func_t handler = irq_handlers[irq];
+		handler_func_t handler = irq_handlers[frame.vector];
 
 		if(handler != NULL) {
+			ok("found handler for IRQ %d", irq);
 			handler(&frame);
 		}
 	} else if(frame.vector == 0x80) {
@@ -106,11 +106,9 @@ void excp_handler(int_frame_t frame) {
 }
 
 void irq_register(uint8_t irq, void *handler) {
+	irq_handlers[irq] = handler;
 	uint32_t lapic_id = smp_request.response->bsp_lapic_id;
 	ioapic_redirect_irq(lapic_id, irq + 32, irq, false);
-	irq_handlers[irq] = handler;
-
-	printf("Registered IRQ %d\n", irq);
 }
 
 void irq_deregister(uint8_t irq) { irq_handlers[irq] = NULL; }

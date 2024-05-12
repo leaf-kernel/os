@@ -21,6 +21,9 @@
 #include <arch/x86_64/mm/pmm.h>
 #include <arch/x86_64/mm/vmm.h>
 
+// Etc includes
+#include <sched/scheduler.h>
+
 // Tools includes
 #include <tools/logger.h>
 #include <tools/panic.h>
@@ -56,6 +59,8 @@ volatile struct limine_kernel_address_request kernel_addr_request = {
 #endif
 
 struct flanterm_context *ft_ctx;
+
+void test(void) { printf("Hello, World!\n"); }
 
 void map_kernel();
 // Kernel entry point.
@@ -115,6 +120,7 @@ void _start(void) {
 	map_kernel();
 	init_acpi();
 	init_apic();
+	init_sched();
 
 	int cores = smp_request.response->cpu_count;
 	if(cores <= 1)
@@ -125,6 +131,9 @@ void _start(void) {
 		printf("\x1b[1;32mLeaf\x1b[0m booted successfully with %d "
 			   "cores!\n",
 			   cores);
+
+	sched_spawn_process("test", test);
+	__asm__("int $32");
 
 	hlt();
 }
