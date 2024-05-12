@@ -84,14 +84,11 @@ void excp_handler(int_frame_t *frame) {
 	if(frame->vector == 0xff)
 		return;
 
-	dprintf("Exeption! %d\n", frame->vector);
-
 	if(frame->vector < 0x20) {
 		panic(exception_strings[frame->vector], frame);
 		hcf();
 	} else if(frame->vector >= 32 && frame->vector <= 47) {
 		int irq = frame->vector - 0x20;
-		dprintf("IRQ %d fired!\n", irq);
 		typedef void (*handler_func_t)(int_frame_t *);
 
 		handler_func_t handler = irq_handlers[irq];
@@ -108,8 +105,6 @@ void irq_register(uint8_t irq, void *handler) {
 	uint32_t lapic_id = smp_request.response->bsp_lapic_id;
 	ioapic_redirect_irq(lapic_id, irq + 32, irq, false);
 	irq_handlers[irq - 0x20] = handler;
-
-	dprintf("Registered IRQ %d. irq_handlers[%d]\n", irq, irq - 0x20);
 }
 
 void irq_deregister(uint8_t irq) { irq_handlers[irq] = NULL; }
