@@ -69,7 +69,7 @@ void init_idt() {
 	asm("sti");
 
 	for(int i = 0; i < IDT_ENTRIES; ++i) {
-		set_idt_gate(i, isr_tbl[i], 0x28, 0x8E);
+		set_idt_gate(i, isr_tbl[i], 0x08, 0x8E);
 	}
 
 	for(size_t i = 0; i < 16; i++) {

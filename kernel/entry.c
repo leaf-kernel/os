@@ -117,13 +117,21 @@ void _start(void) {
 	ft_ctx->full_refresh(ft_ctx);
 
 	init_serial();
+	ok("Initialized Serial");
 	init_gdt((uint64_t *)kernel_stack);
+	ok("Initialized GDT");
 	init_idt();
+	ok("Initialized IDT");
 	init_pmm();
+	ok("Initialized PMM");
 	init_vmm();
+	ok("Initialized VMM");
 	map_kernel();
+	ok("Mapped Kernel");
 	init_acpi();
+	ok("Initialized ACPI");
 	init_apic();
+	ok("Initialized APIC");
 	__asm__ volatile("sti");
 	init_sched();
 
@@ -138,7 +146,7 @@ void _start(void) {
 			   cores);
 
 	sched_spawn_process("kmain", main);
-	__asm__("int $32");
+	// __asm__("int $32");
 
 	hlt();
 }
