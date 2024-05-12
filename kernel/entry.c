@@ -1,5 +1,6 @@
 #include <sys/boot.h>
 #include <sys/error.h>
+#include <sys/leaf.h>
 
 #include "main.h"
 
@@ -37,6 +38,7 @@
 #include <stddef.h>
 
 uint64_t kernel_stack[8192];
+LEAF_DATA data;
 
 #ifdef LEAF_LIMINE
 static volatile LIMINE_BASE_REVISION(2);
@@ -58,6 +60,9 @@ volatile struct limine_smp_request smp_request = {.id = LIMINE_SMP_REQUEST,
 
 volatile struct limine_kernel_address_request kernel_addr_request = {
 	.id = LIMINE_KERNEL_ADDRESS_REQUEST, .revision = 0};
+
+volatile struct limine_module_request mod_request = {
+	.id = LIMINE_MODULE_REQUEST, .revision = 0};
 #endif
 
 struct flanterm_context *ft_ctx;
@@ -136,6 +141,15 @@ void _start(void) {
 		printf("\x1b[1;32mLeaf\x1b[0m booted successfully with %d "
 			   "cores!\n",
 			   cores);
+
+	for(size_t i = 0; i < mod_request.response->module_count; i++) {
+		struct limine_file *mod = mod_request.response->modules[i];
+		if(strcmp(mod->path, "/ramfs") == 0) {
+			data.ramfs = mod;
+		} else {
+			fail("Unknown module \"%s\" found", mod->path);
+		}
+	}
 
 	hlt();
 }

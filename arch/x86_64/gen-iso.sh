@@ -1,4 +1,8 @@
 #!/bin/bash
+mkdir -p modules
+cd ../../
+tar -cvf arch/x86_64/modules/ramfs ramfs/* > /dev/null 2>&1
+cd arch/x86_64
 mkdir -p ../../release
 mkdir -p iso
 mkdir -p iso/boot
