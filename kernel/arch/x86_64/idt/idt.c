@@ -91,7 +91,7 @@ void excp_handler(int_frame_t *frame) {
 		int irq = frame->vector - 0x20;
 		typedef void (*handler_func_t)(int_frame_t *);
 
-		handler_func_t handler = irq_handlers[frame->vector];
+		handler_func_t handler = irq_handlers[irq];
 
 		if(handler != NULL) {
 			handler(frame);
@@ -102,7 +102,7 @@ void excp_handler(int_frame_t *frame) {
 }
 
 void irq_register(uint8_t irq, void *handler) {
-	irq_handlers[irq] = handler;
+	irq_handlers[irq - 0x20] = handler;
 	uint32_t lapic_id = smp_request.response->bsp_lapic_id;
 	ioapic_redirect_irq(lapic_id, irq + 32, irq, false);
 }

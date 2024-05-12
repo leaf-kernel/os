@@ -146,7 +146,7 @@ void _start(void) {
 			   cores);
 
 	sched_spawn_process("kmain", main);
-	// __asm__("int $32");
+	__asm__("int $32");
 
 	hlt();
 }
