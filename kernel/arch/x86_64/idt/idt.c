@@ -4,6 +4,7 @@
 #include <libc/stdio/printf.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/backtrace.h>
 #include <sys/boot.h>
 #include <sys/error.h>
 #include <tools/logger.h>
@@ -85,6 +86,7 @@ void excp_handler(int_frame_t *frame) {
 		return;
 
 	if(frame->vector < 0x20) {
+		backtrace(last_rbp, frame->rip);
 		panic(exception_strings[frame->vector], frame);
 		hcf();
 	} else if(frame->vector >= 32 && frame->vector <= 47) {

@@ -1,3 +1,4 @@
+#include <arch/x86_64/mm/heap.h>
 #include <libc/string.h>
 
 void *memcpy(void *dest, const void *src, size_t n) {
@@ -61,6 +62,15 @@ char *strcat(char *dest, const char *src) {
 	while((*d++ = *s++) != '\0')
 		;
 	return dest;
+}
+
+char *strdup(const char *s) {
+	size_t len = strlen(s) + 1;
+	char *new_s = (char *)malloc(len);
+	if(new_s == NULL) {
+		return NULL;
+	}
+	return strcpy(new_s, s);
 }
 
 char *strncat(char *dest, const char *src, size_t n) {

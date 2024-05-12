@@ -7,18 +7,24 @@
 #include <stdint.h>
 #include <sys/boot.h>
 
-uint8_t *bitmap;
-uint64_t bitmap_pages;
-uint64_t bitmap_size;
-
 #define DIV_ROUND_UP(x, y) (x + (y - 1)) / y
 #define ALIGN_UP(x, y) DIV_ROUND_UP(x, y) * y
 
+uint8_t *bitmap;
+uint64_t bitmap_pages;
+uint64_t bitmap_size;
+uint64_t free_memory;
+uint64_t total_memory;
+
+static volatile struct limine_memmap_response *memmap;
+
 void init_pmm() {
-	volatile struct limine_memmap_response *memmap = memmap_request.response;
+	memmap = memmap_request.response;
 	uint64_t top_address;
 	uint64_t higher_address = 0;
 	uint64_t hhdm_offset = hhdm_request.response->offset;
+	free_memory = 0;
+	total_memory = 0;
 
 	for(uint64_t entryCount = 0; entryCount < memmap->entry_count;
 		entryCount++) {
@@ -28,9 +34,6 @@ void init_pmm() {
 			top_address = entry->base + entry->length;
 			if(top_address > higher_address)
 				higher_address = top_address;
-
-			// ok("Usable entry at 0x%.llx, Top Address: 0x%.llx, Higher"
-			// "Address: 0x%.llx", entry->base, top_address, higher_address);
 		}
 	}
 	bitmap_pages = higher_address / PAGE_SIZE;
@@ -59,6 +62,27 @@ void init_pmm() {
 			for(uint64_t i = 0; i < entry->length; i += PAGE_SIZE) {
 				bitmap_clear(bitmap, (entry->base + i) / PAGE_SIZE);
 			}
+		}
+	}
+
+	update_memory();
+}
+
+void update_memory() {
+	free_memory = 0;
+	total_memory = 0;
+
+	for(uint64_t i = 0; i < bitmap_pages; i++) {
+		if(!bitmap_get(bitmap, i)) {
+			free_memory += PAGE_SIZE;
+		}
+	}
+
+	for(uint64_t entryCount = 0; entryCount < memmap->entry_count;
+		entryCount++) {
+		struct limine_memmap_entry *entry = memmap->entries[entryCount];
+		if(entry->type == LIMINE_MEMMAP_USABLE) {
+			total_memory += entry->length;
 		}
 	}
 }

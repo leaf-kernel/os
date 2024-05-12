@@ -13,26 +13,45 @@ void *malloc(size_t size) {
 }
 
 void free(void *tofree) {
+	if(tofree == NULL) {
+		return;
+	}
 	char *PP = (char *)tofree;
 	PP -= sizeof(size_t);
 	size_t size = *((size_t *)PP);
-	pmm_free_pages(PP, (size / 4096) + 1);
+	pmm_free_pages(PP, (size / PAGE_SIZE) + 1);
 }
 
-void *calloc(size_t count, size_t size) {
-	void *malloced = malloc(count * size);
-	memset(malloced, 0, count * size);
-	return malloced;
+void *calloc(size_t size) {
+	void *mallocVal = malloc(size);
+	if(mallocVal == NULL) {
+		return NULL;
+	}
+	memset(mallocVal, 0, size);
+	return mallocVal;
 }
 
 void *realloc(void *old, size_t size) {
-	size_t smallersize = size;
-	if(old) {
-		smallersize = *((size_t *)old - 1) < size ? *((size_t *)old - 1) : size;
-		void *newmem = malloc(size);
-		memcpy(newmem, old, smallersize);
-		free(old);
-		return newmem;
+	if(old == NULL) {
+		return malloc(size);
 	}
-	return malloc(size);
+
+	size_t old_size = *((size_t *)old - 1);
+
+	size_t new_num_pages = (size / PAGE_SIZE) + 1;
+	size_t old_num_pages = (old_size / PAGE_SIZE) + 1;
+
+	if(new_num_pages > old_num_pages) {
+		void *new_mem = pmm_request_pages(new_num_pages - old_num_pages);
+		if(new_mem == NULL) {
+			return NULL;
+		}
+
+		memcpy(new_mem, old, old_size);
+		free(old);
+
+		return new_mem;
+	} else {
+		return old;
+	}
 }

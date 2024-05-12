@@ -29,6 +29,9 @@
 #include <tools/logger.h>
 #include <tools/panic.h>
 
+// Data includes
+#include <data/tar.h>
+
 // Libc includes
 #include <libc/stdio/printf.h>
 #include <libc/string.h>
@@ -119,11 +122,12 @@ void _start(void) {
 	ft_ctx->full_refresh(ft_ctx);
 
 	__asm__ volatile("cli");
-	init_serial();
 	init_gdt((uint64_t *)kernel_stack);
 	set_kernel_stack((uint64_t *)kernel_stack);
 	init_idt();
 	__asm__ volatile("sti");
+
+	init_serial();
 	init_pmm();
 	init_vmm();
 	map_kernel();
@@ -150,6 +154,8 @@ void _start(void) {
 			fail("Unknown module \"%s\" found", mod->path);
 		}
 	}
+
+	void *test = malloc(4096);
 
 	hlt();
 }

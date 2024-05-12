@@ -5,7 +5,7 @@
 
 #define PAGE_SIZE 4096
 void init_pmm();
-
+void update_memory();
 void *pmm_request_page();
 void *pmm_request_pages(size_t numPages);
 void pmm_free(void *ptr);
