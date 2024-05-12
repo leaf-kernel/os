@@ -28,4 +28,6 @@ extern uint8_t __bss_start;
 extern uint8_t __bss_end;
 extern uint8_t __kernel_end;
 
+extern uint64_t kernel_stack[8192];
+
 #endif	// __BOOT_H__

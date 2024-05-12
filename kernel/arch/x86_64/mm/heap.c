@@ -3,7 +3,10 @@
 #include <libc/string.h>
 
 void *malloc(size_t size) {
-	char *PP = (char *)pmm_request_pages((size / 4096) + 1);
+	char *PP = (char *)pmm_request_pages((size / PAGE_SIZE) + 1);
+	if(PP == NULL) {
+		return NULL;
+	}
 	*((size_t *)PP) = size;
 	PP += sizeof(size_t);
 	return (void *)PP;
