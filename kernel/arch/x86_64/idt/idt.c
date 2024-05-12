@@ -83,23 +83,23 @@ void init_idt() {
 	asm("cli");
 }
 
-void excp_handler(int_frame_t frame) {
-	if(frame.vector == 0xff)
+void excp_handler(int_frame_t *frame) {
+	if(frame->vector == 0xff)
 		return;
 
-	if(frame.vector < 0x20) {
-		panic(exception_strings[frame.vector], &frame);
+	if(frame->vector < 0x20) {
+		panic(exception_strings[frame->vector], frame);
 		hcf();
-	} else if(frame.vector >= 32 && frame.vector <= 47) {
-		int irq = frame.vector - 0x20;
+	} else if(frame->vector >= 32 && frame->vector <= 47) {
+		int irq = frame->vector - 0x20;
 		typedef void (*handler_func_t)(int_frame_t *);
 
-		handler_func_t handler = irq_handlers[frame.vector];
+		handler_func_t handler = irq_handlers[frame->vector];
 
 		if(handler != NULL) {
-			handler(&frame);
+			handler(frame);
 		}
-	} else if(frame.vector == 0x80) {
+	} else if(frame->vector == 0x80) {
 		// TODO: System calls
 	}
 }

@@ -62,6 +62,7 @@ _int_stub:
     mov [last_rbp], rbp
 	pushaq
 	cld
+    mov rdi, rsp
 	call excp_handler
 	popaq
 	add rsp, 16
