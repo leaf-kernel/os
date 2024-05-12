@@ -43,15 +43,16 @@ void ioapic_set_entry(madt_ioapic *ioapic, uint8_t idx, uint64_t data) {
 }
 
 uint64_t ioapic_gsi_count(madt_ioapic *ioapic) {
-	return (ioapic_read(ioapic, 1) & 0xff0000) >> 16;
+	return ((ioapic_read(ioapic, 1) & 0xff0000) >> 16);
 }
 
 madt_ioapic *ioapic_get_gsi(uint32_t gsi) {
 	for(uint64_t i = 0; i < madt_ioapic_len; i++) {
 		madt_ioapic *ioapic = madt_ioapic_list[i];
 		if(ioapic->gsi_base <= gsi &&
-		   ioapic->gsi_base + ioapic_gsi_count(ioapic) > gsi)
+		   ioapic->gsi_base + ioapic_gsi_count(ioapic) > gsi) {
 			return ioapic;
+		}
 	}
 
 	return NULL;
@@ -63,7 +64,7 @@ void ioapic_redirect_gsi(uint32_t lapic_id, uint8_t vec, uint32_t gsi,
 	madt_ioapic *ioapic = ioapic_get_gsi(gsi);
 
 	if(ioapic == NULL) {
-		error("IOAPIC: Invalid GSI", ERRNO_NULL_VALUE, true);
+		return;
 	}
 
 	uint64_t redirect = vec;

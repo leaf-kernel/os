@@ -18,7 +18,6 @@
 #include <arch/x86_64/idt/idt.h>
 #include <arch/x86_64/mm/heap.h>
 #include <arch/x86_64/mm/pmm.h>
-#include <arch/x86_64/sched/scheduler.h>
 
 // Tools includes
 #include <tools/logger.h>
@@ -110,10 +109,16 @@ void _start(void) {
 	init_pmm();
 	init_acpi();
 	init_apic();
-	init_sched();
 
-	sched_add_process("penis", test);
-	__asm__("int $32");
+	int cores = smp_request.response->cpu_count;
+	if(cores <= 1)
+		printf("\x1b[1;32mLeaf\x1b[0m booted successfully with %d "
+			   "core!\n",
+			   cores);
+	else
+		printf("\x1b[1;32mLeaf\x1b[0m booted successfully with %d "
+			   "cores!\n",
+			   cores);
 
 	hlt();
 }

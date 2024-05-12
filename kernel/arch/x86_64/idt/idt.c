@@ -15,6 +15,7 @@ idt_entry_t idt[IDT_ENTRIES];
 idt_pointer_t idt_p;
 void *irq_handlers[16];
 extern void *last_rbp;
+int g_irq_count;
 
 extern uint64_t isr_tbl[];
 
@@ -76,6 +77,8 @@ void init_idt() {
 		irq_handlers[i] = NULL;
 	}
 
+	g_irq_count = 0;
+
 	load_idt((uint64_t)&idt_p);
 	asm("cli");
 }
@@ -106,6 +109,8 @@ void irq_register(uint8_t irq, void *handler) {
 	uint32_t lapic_id = smp_request.response->bsp_lapic_id;
 	ioapic_redirect_irq(lapic_id, irq + 32, irq, false);
 	irq_handlers[irq] = handler;
+
+	printf("Registered IRQ %d\n", irq);
 }
 
 void irq_deregister(uint8_t irq) { irq_handlers[irq] = NULL; }

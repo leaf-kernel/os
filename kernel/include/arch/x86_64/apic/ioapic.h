@@ -2,6 +2,7 @@
 #ifndef __IOAPIC_H__
 #define __IOAPIC_H__
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include <arch/x86_64/acpi/acpi.h>
@@ -20,6 +21,8 @@ void init_ioapic();
 void ioapic_write(madt_ioapic *ioapic, uint8_t reg, uint32_t val);
 uint32_t ioapic_read(madt_ioapic *ioapic, uint8_t reg);
 
+void ioapic_redirect_gsi(uint32_t lapic_id, uint8_t vec, uint32_t gsi,
+						 uint16_t flags, bool mask);
 void ioapic_redirect_irq(uint32_t lapic_id, uint8_t vec, uint8_t irq,
 						 bool mask);
 uint32_t ioapic_get_redirect_irq(uint8_t irq);
