@@ -60,7 +60,7 @@ volatile struct limine_kernel_address_request kernel_addr_request = {
 
 struct flanterm_context *ft_ctx;
 
-void test(void) { printf("Hello, World!\n"); }
+void test(void) { __asm__("int $3"); }
 
 void map_kernel();
 // Kernel entry point.

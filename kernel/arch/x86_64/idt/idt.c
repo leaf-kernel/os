@@ -97,7 +97,6 @@ void excp_handler(int_frame_t frame) {
 		handler_func_t handler = irq_handlers[frame.vector];
 
 		if(handler != NULL) {
-			ok("found handler for IRQ %d", irq);
 			handler(&frame);
 		}
 	} else if(frame.vector == 0x80) {
