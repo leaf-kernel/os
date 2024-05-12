@@ -24,9 +24,6 @@
 #include <arch/x86_64/mm/pmm.h>
 #include <arch/x86_64/mm/vmm.h>
 
-// Etc includes
-#include <sched/scheduler.h>
-
 // Tools includes
 #include <tools/logger.h>
 #include <tools/panic.h>
@@ -116,24 +113,19 @@ void _start(void) {
 	ft_ctx->cursor_enabled = false;
 	ft_ctx->full_refresh(ft_ctx);
 
+	__asm__ volatile("cli");
 	init_serial();
-	ok("Initialized Serial");
 	init_gdt((uint64_t *)kernel_stack);
-	ok("Initialized GDT");
+	set_kernel_stack((uint64_t *)kernel_stack);
 	init_idt();
-	ok("Initialized IDT");
-	init_pmm();
-	ok("Initialized PMM");
-	init_vmm();
-	ok("Initialized VMM");
-	map_kernel();
-	ok("Mapped Kernel");
-	init_acpi();
-	ok("Initialized ACPI");
-	init_apic();
-	ok("Initialized APIC");
 	__asm__ volatile("sti");
-	init_sched();
+	init_pmm();
+	init_vmm();
+	map_kernel();
+	init_acpi();
+	init_apic();
+	init_hpet();
+	lapic_calibrate_timer();
 
 	int cores = smp_request.response->cpu_count;
 	if(cores <= 1)
@@ -144,9 +136,6 @@ void _start(void) {
 		printf("\x1b[1;32mLeaf\x1b[0m booted successfully with %d "
 			   "cores!\n",
 			   cores);
-
-	sched_spawn_process("kmain", main);
-	__asm__("int $32");
 
 	hlt();
 }

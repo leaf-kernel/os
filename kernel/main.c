@@ -4,5 +4,5 @@
 
 void main(void) {
 	ok("Reached main!");
-	hlt();
+	hcf();
 }

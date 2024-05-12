@@ -21,11 +21,7 @@ void wrmsr(uint32_t msr, uint64_t val) {
 					   "c"(msr));
 }
 
-void init_lapic() {
-	lapic_write(0xf0, lapic_read(0xf0) | 0x100);
-	init_hpet();
-	lapic_calibrate_timer();
-}
+void init_lapic() { lapic_write(0xf0, lapic_read(0xf0) | 0x100); }
 
 void lapic_stop_timer() {
 	lapic_write(LAPIC_TIMER_INITCNT, 0);
