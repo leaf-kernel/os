@@ -50,8 +50,6 @@ uint32_t sched_spawn_process(char *name, void (*entry)(void)) {
 		processes[sched_num_procs].regs.rflags = 0x202;
 		processes[sched_num_procs].state = SCHED_STATE_READY;
 		sched_num_procs++;
-
-		ok("Spawned process \"%s\" with PID %d", name, sched_num_procs);
 		return sched_num_procs - 1;
 	}
 	return -1;

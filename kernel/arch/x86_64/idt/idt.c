@@ -90,7 +90,7 @@ void excp_handler(int_frame_t frame) {
 	if(frame.vector < 0x20) {
 		panic(exception_strings[frame.vector], &frame);
 		hcf();
-	} else if(frame.vector >= 0x20 && frame.vector <= 32) {
+	} else if(frame.vector >= 32 && frame.vector <= 47) {
 		int irq = frame.vector - 0x20;
 		typedef void (*handler_func_t)(int_frame_t *);
 

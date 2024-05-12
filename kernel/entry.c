@@ -1,6 +1,8 @@
 #include <sys/boot.h>
 #include <sys/error.h>
 
+#include "main.h"
+
 // Wrapper includes
 #include <backends/framebuffer.h>
 
@@ -60,8 +62,6 @@ volatile struct limine_kernel_address_request kernel_addr_request = {
 
 struct flanterm_context *ft_ctx;
 
-void test(void) { __asm__("int $3"); }
-
 void map_kernel();
 // Kernel entry point.
 void _start(void) {
@@ -120,6 +120,7 @@ void _start(void) {
 	map_kernel();
 	init_acpi();
 	init_apic();
+	__asm__ volatile("sti");
 	init_sched();
 
 	int cores = smp_request.response->cpu_count;
@@ -132,7 +133,7 @@ void _start(void) {
 			   "cores!\n",
 			   cores);
 
-	sched_spawn_process("test", test);
+	sched_spawn_process("kmain", main);
 	__asm__("int $32");
 
 	hlt();
