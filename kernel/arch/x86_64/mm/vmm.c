@@ -114,6 +114,29 @@ void vmm_map(uint64_t vaddr, uint64_t paddr, uint32_t flags) {
 		PML1;
 }
 
+bool vmm_unmap_page(uint64_t vaddr) {
+	size_t pml4_index = (vaddr & ((uintptr_t)0x1ff << 39)) >> 39;
+	size_t pml3_index = (vaddr & ((uintptr_t)0x1ff << 30)) >> 30;
+	size_t pml2_index = (vaddr & ((uintptr_t)0x1ff << 21)) >> 21;
+	size_t pml1_index = (vaddr & ((uintptr_t)0x1ff << 12)) >> 12;
+
+	uintptr_t *pml4 = (uintptr_t *)PML4Array.entries;
+	if(!(pml4[pml4_index] & _VMM_PRESENT)) {
+		return false;
+	}
+	uintptr_t *pml3 = (uintptr_t *)(pml4[pml4_index] & ~0xFFF);
+	if(!(pml3[pml3_index] & _VMM_PRESENT)) {
+		return false;
+	}
+	uintptr_t *pml2 = (uintptr_t *)(pml3[pml3_index] & ~0xFFF);
+	if(!(pml2[pml2_index] & _VMM_PRESENT)) {
+		return false;
+	}
+	uintptr_t *pml1 = (uintptr_t *)(pml2[pml2_index] & ~0xFFF);
+	pml1[pml1_index] = 0;
+	return true;
+}
+
 void vmm_map_range(void *virt, void *phys, void *virt_end, uint32_t perms) {
 	for(virt; virt < virt_end; virt += PAGE_SIZE, phys += PAGE_SIZE) {
 		vmm_map((uint64_t)virt, (uint64_t)phys, perms);

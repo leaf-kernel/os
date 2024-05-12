@@ -72,6 +72,7 @@ typedef struct {
 
 void *get_physaddr(uint64_t vaddr);
 void vmm_map(uint64_t vaddr, uint64_t paddr, uint32_t flags);
+bool vmm_unmap_page(uint64_t vaddr);
 void vmm_map_range(void *virt, void *phys, void *virt_end, uint32_t perms);
 
 void init_vmm();
