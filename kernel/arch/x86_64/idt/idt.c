@@ -15,7 +15,6 @@ idt_entry_t idt[IDT_ENTRIES];
 idt_pointer_t idt_p;
 void *irq_handlers[16];
 extern void *last_rbp;
-int g_irq_count;
 
 extern uint64_t isr_tbl[];
 
@@ -76,8 +75,6 @@ void init_idt() {
 	for(size_t i = 0; i < 16; i++) {
 		irq_handlers[i] = NULL;
 	}
-
-	g_irq_count = 0;
 
 	load_idt((uint64_t)&idt_p);
 	asm("cli");

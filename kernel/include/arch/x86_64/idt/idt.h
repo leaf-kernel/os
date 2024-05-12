@@ -50,7 +50,6 @@ typedef struct {
 } __attribute__((packed)) int_frame_t;
 
 extern void *last_rbp;
-extern int g_irq_count;
 
 void load_idt(uint64_t);
 void trigger_interupt(uint64_t a);

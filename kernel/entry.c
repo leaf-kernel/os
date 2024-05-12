@@ -17,6 +17,7 @@
 #include <arch/x86_64/apic/apic.h>
 #include <arch/x86_64/cpu/cpu.h>
 #include <arch/x86_64/drivers/serial.h>
+#include <arch/x86_64/gdt/gdt.h>
 #include <arch/x86_64/idt/idt.h>
 #include <arch/x86_64/mm/heap.h>
 #include <arch/x86_64/mm/mm.h>
@@ -37,6 +38,8 @@
 // Freestanding header includes
 #include <stdbool.h>
 #include <stddef.h>
+
+uint64_t kernel_stack[8192];
 
 #ifdef LEAF_LIMINE
 static volatile LIMINE_BASE_REVISION(2);
@@ -114,6 +117,7 @@ void _start(void) {
 	ft_ctx->full_refresh(ft_ctx);
 
 	init_serial();
+	init_gdt((uint64_t *)kernel_stack);
 	init_idt();
 	init_pmm();
 	init_vmm();
