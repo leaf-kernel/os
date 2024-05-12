@@ -1,9 +1,9 @@
 // Full credits to: https://github.com/asterd-og/ZanOS
 #include <arch/x86_64/apic/ioapic.h>
 #include <arch/x86_64/drivers/serial.h>
+#include <arch/x86_64/mm/mm.h>
 #include <arch/x86_64/mm/pmm.h>
 #include <libc/stdio/printf.h>
-#include <sys/boot.h>
 #include <sys/error.h>
 
 void init_ioapic() {

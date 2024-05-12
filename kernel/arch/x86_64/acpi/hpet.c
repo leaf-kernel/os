@@ -1,7 +1,7 @@
 #include <arch/x86_64/acpi/acpi.h>
 #include <arch/x86_64/acpi/hpet.h>
 #include <arch/x86_64/cpu/cpu.h>
-#include <sys/boot.h>
+#include <arch/x86_64/mm/mm.h>
 #include <tools/logger.h>
 
 hpet_regs *regs;

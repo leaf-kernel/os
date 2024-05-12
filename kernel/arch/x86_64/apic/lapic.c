@@ -3,7 +3,7 @@
 #include <arch/x86_64/apic/lapic.h>
 #include <arch/x86_64/cpu/cpu.h>
 #include <arch/x86_64/drivers/serial.h>
-#include <sys/boot.h>
+#include <arch/x86_64/mm/mm.h>
 
 uint64_t apic_ticks = 0;
 

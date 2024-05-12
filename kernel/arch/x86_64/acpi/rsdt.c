@@ -2,6 +2,7 @@
 #include <arch/x86_64/acpi/fadt.h>
 #include <arch/x86_64/acpi/madt.h>
 #include <arch/x86_64/acpi/rsdt.h>
+#include <arch/x86_64/mm/mm.h>
 
 #include <sys/boot.h>
 #include <tools/logger.h>

@@ -17,7 +17,9 @@
 #include <arch/x86_64/drivers/serial.h>
 #include <arch/x86_64/idt/idt.h>
 #include <arch/x86_64/mm/heap.h>
+#include <arch/x86_64/mm/mm.h>
 #include <arch/x86_64/mm/pmm.h>
+#include <arch/x86_64/mm/vmm.h>
 
 // Tools includes
 #include <tools/logger.h>
@@ -48,12 +50,14 @@ volatile struct limine_rsdp_request rsdp_request = {.id = LIMINE_RSDP_REQUEST,
 
 volatile struct limine_smp_request smp_request = {.id = LIMINE_SMP_REQUEST,
 												  .revision = 0};
+
+volatile struct limine_kernel_address_request kernel_addr_request = {
+	.id = LIMINE_KERNEL_ADDRESS_REQUEST, .revision = 0};
 #endif
 
 struct flanterm_context *ft_ctx;
 
-void test(void) { printf("Hello, world!\n"); }
-
+void map_kernel();
 // Kernel entry point.
 void _start(void) {
 	struct leaf_framebuffer *framebuffer;
@@ -107,6 +111,8 @@ void _start(void) {
 	init_serial();
 	init_idt();
 	init_pmm();
+	init_vmm();
+	map_kernel();
 	init_acpi();
 	init_apic();
 
@@ -121,4 +127,71 @@ void _start(void) {
 			   cores);
 
 	hlt();
+}
+
+void map_kernel() {
+	volatile struct limine_memmap_response *memmap = memmap_request.response;
+	uint64_t hhdm_offset = hhdm_request.response->offset;
+
+	vmm_map_range(
+		&__kernel_start,
+		(void *)((uint64_t)&__kernel_start -
+				 (uint64_t)kernel_addr_request.response->virtual_base +
+				 (uint64_t)kernel_addr_request.response->physical_base),
+		&__kernel_end, _VMM_PRESENT | _VMM_EXECUTE_DISABLE);
+
+	vmm_map_range(
+		&__text_start,
+		(void *)((uint64_t)&__text_start -
+				 (uint64_t)kernel_addr_request.response->virtual_base +
+				 (uint64_t)kernel_addr_request.response->physical_base),
+		&__text_end, _VMM_PRESENT);
+
+	ALIGN_ADDRESS_UP(&__text_end, 4096);
+	vmm_map_range(
+		&__rodata_start,
+		(void *)((uint64_t)&__rodata_start -
+				 (uint64_t)kernel_addr_request.response->virtual_base +
+				 (uint64_t)kernel_addr_request.response->physical_base),
+		&__rodata_end, _VMM_PRESENT | _VMM_EXECUTE_DISABLE);
+
+	ALIGN_ADDRESS_UP(&__rodata_end, 4096);
+	vmm_map_range(
+		&__data_start,
+		(void *)((uint64_t)&__data_start -
+				 (uint64_t)kernel_addr_request.response->virtual_base +
+				 (uint64_t)kernel_addr_request.response->physical_base),
+		&__data_end, _VMM_PRESENT | _VMM_WRITE | _VMM_EXECUTE_DISABLE);
+
+	ALIGN_ADDRESS_UP(&__data_end, 4096);
+	vmm_map_range(
+		&__bss_start,
+		(void *)((uint64_t)&__bss_start -
+				 (uint64_t)kernel_addr_request.response->virtual_base +
+				 (uint64_t)kernel_addr_request.response->physical_base),
+		&__bss_end, _VMM_PRESENT | _VMM_WRITE | _VMM_EXECUTE_DISABLE);
+
+	ALIGN_ADDRESS_UP(&__bss_end, 4096);
+	for(uint64_t entryCount = 0; entryCount < memmap->entry_count;
+		entryCount++) {
+		struct limine_memmap_entry *entry = memmap->entries[entryCount];
+
+		if(entry == NULL) {
+			error("Failed to get memmap entry!", ERRNO_NULL_VALUE, true);
+		}
+
+		if((entry->base + entry->length) < 0x100000000)
+			continue;
+		uint64_t addr = entry->base & ~0xfff;
+		uint64_t length = entry->length + 0xfff;
+		length &= ~0xfff;
+
+		for(uint64_t j = 0; j < length; j += 0x1000) {
+			vmm_map_range((void *)(uint64_t)entry->base + (uint64_t)hhdm_offset,
+						  &entry->base,
+						  (void *)(uint64_t)entry->base +
+							  (uint64_t)entry->length,
+						  _VMM_PRESENT | _VMM_WRITE | _VMM_EXECUTE_DISABLE);
+		}
+	}
 }

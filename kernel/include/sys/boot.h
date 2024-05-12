@@ -13,10 +13,19 @@ extern volatile struct limine_memmap_request memmap_request;
 extern volatile struct limine_hhdm_request hhdm_request;
 extern volatile struct limine_rsdp_request rsdp_request;
 extern volatile struct limine_smp_request smp_request;
-
-#define VIRT_TO_PHYS(addr) ((uint64_t)(addr) - hhdm_request.response->offset)
-#define PHYS_TO_VIRT(addr) ((uint64_t)(addr) + hhdm_request.response->offset)
+extern volatile struct limine_kernel_address_request kernel_addr_request;
 
 #endif
+
+extern uint8_t __kernel_start;
+extern uint8_t __text_start;
+extern uint8_t __text_end;
+extern uint8_t __rodata_start;
+extern uint8_t __rodata_end;
+extern uint8_t __data_start;
+extern uint8_t __data_end;
+extern uint8_t __bss_start;
+extern uint8_t __bss_end;
+extern uint8_t __kernel_end;
 
 #endif	// __BOOT_H__

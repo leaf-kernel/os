@@ -3,6 +3,7 @@
 #include <arch/x86_64/acpi/rsdt.h>
 #include <arch/x86_64/cpu/cpuid.h>
 #include <arch/x86_64/drivers/serial.h>
+#include <arch/x86_64/mm/mm.h>
 #include <sys/boot.h>
 #include <tools/panic.h>
 
